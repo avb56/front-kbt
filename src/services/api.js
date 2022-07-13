@@ -1,6 +1,6 @@
 import axios from "axios";
 import TokenService from "./token.service";
-
+/*
 const instance = axios.create({
   baseURL: "https://test.orenkontur.ru/api",
   headers: {
@@ -53,4 +53,38 @@ instance.interceptors.response.use(
   }
 );
 
-export default instance;
+let method;
+
+const apiOFF = {
+  [method]: (url, bodyObject) => fetch('https://test.orenkontur.ru/api' + url, {
+    method: method.toUpperCase(),
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      'x-access-token': TokenService.getLocalAccessToken()
+    },
+    body: bodyObject && JSON.stringify(bodyObject)
+  }).then(response => response.json())
+}
+*/
+const api = {
+  get: function(url) { return fetch('https://test.orenkontur.ru/api' + url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      'x-access-token': TokenService.getLocalAccessToken()
+    },
+  }).then(response => { return { data: response.text() }})},
+
+  post: (url, bodyObject) => fetch('https://test.orenkontur.ru/api' + url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      'x-access-token': TokenService.getLocalAccessToken()
+    },
+    body: bodyObject && JSON.stringify(bodyObject)
+  }).then(response => response.json()),
+
+}
+
+export default api;
+//export default instance;

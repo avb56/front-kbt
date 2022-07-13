@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+            {
+                "type": "node-terminal",
+                "name": "Run Script: start",
+                "request": "launch",
+                "command": "npm start",
+                "program": "${file}",
+                "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "firefox",
+            "request": "attach",
+            "name": "Launch firefox debug"
+        }
+    ]
+}
