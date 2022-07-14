@@ -1,4 +1,4 @@
-import axios from "axios";
+//import axios from "axios";
 import TokenService from "./token.service";
 /*
 const instance = axios.create({
@@ -67,13 +67,13 @@ const apiOFF = {
 }
 */
 const api = {
-  get: function(url) { return fetch('https://test.orenkontur.ru/api' + url, {
+  get: (url) => fetch('https://test.orenkontur.ru/api' + url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
       'x-access-token': TokenService.getLocalAccessToken()
-    },
-  }).then(response => { return { data: response.text() }})},
+    }
+  }).then(response => response.text()).then(data => ({ data })),
 
   post: (url, bodyObject) => fetch('https://test.orenkontur.ru/api' + url, {
     method: 'POST',
@@ -82,8 +82,7 @@ const api = {
       'x-access-token': TokenService.getLocalAccessToken()
     },
     body: bodyObject && JSON.stringify(bodyObject)
-  }).then(response => response.json()),
-
+  }).then(response => response.json()).then(data => ({ data }))
 }
 
 export default api;
