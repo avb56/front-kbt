@@ -54,18 +54,33 @@ instance.interceptors.response.use(
 );
 
 let method;
-
-const apiOFF = {
-  [method]: (url, bodyObject) => fetch('https://test.orenkontur.ru/api' + url, {
-    method: method.toUpperCase(),
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8',
-      'x-access-token': TokenService.getLocalAccessToken()
-    },
-    body: bodyObject && JSON.stringify(bodyObject)
-  }).then(response => response.json())
-}
 */
+
+const isJsonResponse = res => res.headers.get('Content-Type').includes('/json');
+const readBodyResponse = res => res[isJsonResponse(res) ? 'json' : 'text']().then(data => ({ data }));
+const reNewToken = res => 'stub';
+
+const customFetch = (method, url, bodyObject) => fetch('https://test.orenkontur.ru/api' + url, {
+  method,
+  headers: {
+    'Content-Type': 'application/json;charset=utf-8',
+    'x-access-token': TokenService.getLocalAccessToken()
+  },
+  body: bodyObject && JSON.stringify(bodyObject)
+})
+.then(response => {
+  if (response.status != 401) return readBodyResponse(response);
+  return api.post("/auth/refreshtoken", {
+    refreshToken: TokenService.getLocalRefreshToken(),
+  }).then(response => console.log(response));
+})
+
+const api = {
+  get: (url) => customFetch('GET', url),
+  post: (url, bodyObject) => customFetch('POST', url, bodyObject)
+}
+
+/*
 const api = {
   get: (url) => fetch('https://test.orenkontur.ru/api' + url, {
     method: 'GET',
@@ -73,7 +88,15 @@ const api = {
       'Content-Type': 'application/json;charset=utf-8',
       'x-access-token': TokenService.getLocalAccessToken()
     }
-  }).then(response => response.text()).then(data => ({ data })),
+  }).then(response => {
+    if (response.status == 401) {
+      api.post("/auth/refreshtoken", {
+        refreshToken: TokenService.getLocalRefreshToken(),
+      }).then(response => console.log(response));
+    } else {
+      return response.text();
+    }
+  }).then(data => ({ data })),
 
   post: (url, bodyObject) => fetch('https://test.orenkontur.ru/api' + url, {
     method: 'POST',
@@ -84,6 +107,6 @@ const api = {
     body: bodyObject && JSON.stringify(bodyObject)
   }).then(response => response.json()).then(data => ({ data }))
 }
-
+*/
 export default api;
 //export default instance;
