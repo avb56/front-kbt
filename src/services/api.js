@@ -58,9 +58,10 @@ let method;
 
 const isJsonResponse = res => res.headers.get('Content-Type').includes('/json');
 const readBodyResponse = res => res[isJsonResponse(res) ? 'json' : 'text']().then(data => ({ data }));
-const reNewToken = res => 'stub';
+const baseUrl = 'http://192.168.1.175:8080/api';
+//const baseUrl = 'https://test.orenkontur.ru/api';
 
-const customFetch = (method, url, bodyObject) => fetch('https://test.orenkontur.ru/api' + url, {
+const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   method,
   headers: {
     'Content-Type': 'application/json;charset=utf-8',
