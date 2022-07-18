@@ -58,7 +58,8 @@ let method;
 
 const isJsonResponse = res => res.headers.get('Content-Type').includes('/json');
 const readBodyResponse = res => res[isJsonResponse(res) ? 'json' : 'text']().then(data => ({ data }));
-const baseUrl = 'http://192.168.1.175:8080/api';
+//const baseUrl = 'http://192.168.1.175:8080/api';
+const baseUrl = 'http://192.168.78.159:8080/api';
 //const baseUrl = 'https://test.orenkontur.ru/api';
 
 const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
@@ -70,10 +71,14 @@ const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   body: bodyObject && JSON.stringify(bodyObject)
 })
 .then(response => {
-  if (response.status != 401) return readBodyResponse(response);
-  return api.post("/auth/refreshtoken", {
+  if (response.ok) return readBodyResponse(response);
+  if (response.status == 401) return api.post("/auth/refreshtoken", {
     refreshToken: TokenService.getLocalRefreshToken(),
-  }).then(response => console.log(response));
+  }).then(response => {
+    TokenService.updateLocalTokens(response.data);
+    return customFetch(method, url, bodyObject)
+  });
+  throw(response);
 })
 
 const api = {
