@@ -60,12 +60,18 @@ export default instance;
 const parseType = headers => headers.get('Content-Type').includes('/json') ? 'json' : 'text';
 const readBodyResponse = response => response[parseType(response.headers)]()
   .then(data => {
-    response[response.ok ? 'data' : 'message'] = data;
-    return response;
+    if (response.ok) {
+      response.data = data;
+      return response;
+    } else {
+      response.message = data.message;
+      throw(response);
+    }
   });
 //const baseUrl = 'http://192.168.1.175:8080/api';
 //const baseUrl = 'http://192.168.78.159:8080/api';
-const baseUrl = 'https://test.orenkontur.ru/api';
+const baseUrl = 'http://localhost:8080/api';
+//const baseUrl = 'https://test.orenkontur.ru/api';
 
 const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   method,

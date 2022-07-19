@@ -18,10 +18,10 @@ const BoardUser = () => {
             error.response.data.message) ||
           error.message ||
           error.toString();
-
+          //console.log(error);
         setContent(_content);
 
-        if (error.response && error.response.status === 403) {
+        if (error.status === 403) {
           EventBus.dispatch("logout");
         }
       }
