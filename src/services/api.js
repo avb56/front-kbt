@@ -1,6 +1,6 @@
-//import axios from "axios";
 import TokenService from "./token.service";
 /*
+import axios from "axios";
 const instance = axios.create({
   baseURL: "https://test.orenkontur.ru/api",
   headers: {
@@ -53,14 +53,19 @@ instance.interceptors.response.use(
   }
 );
 
-let method;
+export default instance;
+
 */
 
-const isJsonResponse = res => res.headers.get('Content-Type').includes('/json');
-const readBodyResponse = res => res[isJsonResponse(res) ? 'json' : 'text']().then(data => ({ data }));
+const parseType = headers => headers.get('Content-Type').includes('/json') ? 'json' : 'text';
+const readBodyResponse = response => response[parseType(response.headers)]()
+  .then(data => {
+    response[response.ok ? 'data' : 'message'] = data;
+    return response;
+  });
 //const baseUrl = 'http://192.168.1.175:8080/api';
-const baseUrl = 'http://192.168.78.159:8080/api';
-//const baseUrl = 'https://test.orenkontur.ru/api';
+//const baseUrl = 'http://192.168.78.159:8080/api';
+const baseUrl = 'https://test.orenkontur.ru/api';
 
 const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   method,
@@ -71,14 +76,17 @@ const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   body: bodyObject && JSON.stringify(bodyObject)
 })
 .then(response => {
-  if (response.ok) return readBodyResponse(response);
+  // console.log(response);
+ 
   if (response.status == 401) return api.post("/auth/refreshtoken", {
     refreshToken: TokenService.getLocalRefreshToken(),
-  }).then(response => {
+  })
+  .then(response => {
     TokenService.updateLocalTokens(response.data);
     return customFetch(method, url, bodyObject)
   });
-  throw(response);
+  return readBodyResponse(response);
+  //throw(response.text());
 })
 
 const api = {
@@ -86,33 +94,4 @@ const api = {
   post: (url, bodyObject) => customFetch('POST', url, bodyObject)
 }
 
-/*
-const api = {
-  get: (url) => fetch('https://test.orenkontur.ru/api' + url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8',
-      'x-access-token': TokenService.getLocalAccessToken()
-    }
-  }).then(response => {
-    if (response.status == 401) {
-      api.post("/auth/refreshtoken", {
-        refreshToken: TokenService.getLocalRefreshToken(),
-      }).then(response => console.log(response));
-    } else {
-      return response.text();
-    }
-  }).then(data => ({ data })),
-
-  post: (url, bodyObject) => fetch('https://test.orenkontur.ru/api' + url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8',
-      'x-access-token': TokenService.getLocalAccessToken()
-    },
-    body: bodyObject && JSON.stringify(bodyObject)
-  }).then(response => response.json()).then(data => ({ data }))
-}
-*/
 export default api;
-//export default instance;
