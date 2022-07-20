@@ -1,26 +1,16 @@
 import api from "./api";
 
 const getPublicContent = () => {
-  return api.get("/test/all");
+  return api.get("/test");
 };
 
 const getUserBoard = () => {
-  return api.get("/test/user");
-};
-
-const getModeratorBoard = () => {
-  return api.get("/test/mod");
-};
-
-const getAdminBoard = () => {
-  return api.get("/test/admin");
+  return api.get("/data");
 };
 
 const UserService = {
   getPublicContent,
-  getUserBoard,
-  getModeratorBoard,
-  getAdminBoard,
+  getUserBoard
 };
 
 export default UserService;
