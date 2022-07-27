@@ -7,9 +7,9 @@ const login = (username, password) => {
       username,
       password
     })
-    .then((response) => {;
+    .then((response) => {
       if (response.data.accessToken) {
-        TokenService.setUser(response.data);
+        TokenService.updateLocalTokens(response.data);
       }
 
       return response.data;
@@ -21,7 +21,7 @@ const logout = () => {
 };
 
 const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem("user"));
+  return TokenService.getUser();
 };
 
 const AuthService = {

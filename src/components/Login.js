@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import AuthService from "../services/auth.service";
+import TokenService from "../services/token.service";
 
 const Login = (props) => {
 
@@ -25,23 +26,24 @@ const Login = (props) => {
     setMessage("");
     setLoading(true);
 
-      AuthService.login(username, password).then(
-        () => {
-          //props.history.push("/profile");
-          window.location.reload();
-        },
-        (error) => {
-          const resMessage =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString();
+    AuthService.login(username, password).then(
+      response => {
+        window.location.reload();
+        // return response;
+        // TokenService.updateLocalTokens(response.data);
+      },
+      (error) => {
+        const resMessage =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
 
-          setLoading(false);
-          setMessage(resMessage);
-        }
-      );
+        setLoading(false);
+        setMessage(resMessage);
+      }
+    );
   };
 
   return (

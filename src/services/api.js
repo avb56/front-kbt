@@ -15,6 +15,7 @@ const readBodyResponse = response => response[parseType(response.headers)]()
 //const baseUrl = 'http://192.168.78.159:8080/api';
 const baseUrl = 'http://localhost:8080/api';
 //const baseUrl = 'https://test.orenkontur.ru/api';
+//const baseUrl = 'http://192.168.78.22/1c-jwt-master/hs/api';
 
 const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   method,

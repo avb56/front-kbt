@@ -1,44 +1,51 @@
-const getLocalRefreshToken = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  return user?.refreshToken;
-};
+import api from "./api";
+//var accessToken;
 
-const getLocalAccessToken = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  return user?.accessToken;
-};
+const getLocalRefreshToken = () => localStorage.getItem("refreshToken");
 
-const updateLocalAccessToken = (token) => {
-  let user = JSON.parse(localStorage.getItem("user"));
-  user.accessToken = token;
-  localStorage.setItem("user", JSON.stringify(user));
-};
+const getLocalAccessToken = () => window.accessToken;
+
+const setLocalTokens = (data) => {
+  localStorage.setItem("tempAccessToken", data.accessToken);
+  localStorage.setItem("refreshToken", data.refreshToken);
+}
 
 const updateLocalTokens = (data) => {
-  let user = JSON.parse(localStorage.getItem("user"));
-  localStorage.setItem("user", JSON.stringify({ ...user, ...data }));
-};
+  window.accessToken = data.accessToken;
+  localStorage.setItem("refreshToken", data.refreshToken);
+}
 
-const getUser = () => {
-  return JSON.parse(localStorage.getItem("user"));
-};
+const getUserFromJwt = () => {
+  const tokenPayLoad = atob(getLocalAccessToken().split('.')[1]);
+  console.log('tokenPayLoad: ' + tokenPayLoad);
+  return { username: JSON.parse(tokenPayLoad).user }
+}
 
-const setUser = (user) => {
-  console.log(JSON.stringify(user));
-  localStorage.setItem("user", JSON.stringify(user));
+const getUser = async () => {
+  if (getLocalAccessToken()) {
+    return getUserFromJwt();
+  } else {
+    if (getLocalRefreshToken()) {
+      const response = await api.post("/auth", { refreshToken: getLocalRefreshToken() });
+      //console.log(response);
+      if (response && response.data) {
+        updateLocalTokens(response.data);
+        return getUserFromJwt();
+      }
+    }
+  }
 };
 
 const removeUser = () => {
-  localStorage.removeItem("user");
+  localStorage.removeItem("refreshToken");
 };
 
 const TokenService = {
   getLocalRefreshToken,
   getLocalAccessToken,
-  updateLocalAccessToken,
+  setLocalTokens,
   updateLocalTokens,
   getUser,
-  setUser,
   removeUser,
 };
 

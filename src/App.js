@@ -13,11 +13,7 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState(undefined);
 
   useEffect(() => {
-    const user = AuthService.getCurrentUser();
-
-    if (user) {
-      setCurrentUser(user);
-    }
+    AuthService.getCurrentUser().then(setCurrentUser);
 
     EventBus.on("logout", () => {
       logOut();
