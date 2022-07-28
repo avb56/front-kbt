@@ -5,11 +5,6 @@ const getLocalRefreshToken = () => localStorage.getItem("refreshToken");
 
 const getLocalAccessToken = () => window.accessToken;
 
-const setLocalTokens = (data) => {
-  localStorage.setItem("tempAccessToken", data.accessToken);
-  localStorage.setItem("refreshToken", data.refreshToken);
-}
-
 const updateLocalTokens = (data) => {
   window.accessToken = data.accessToken;
   localStorage.setItem("refreshToken", data.refreshToken);
@@ -18,7 +13,7 @@ const updateLocalTokens = (data) => {
 const getUserFromJwt = () => {
   const tokenPayLoad = atob(getLocalAccessToken().split('.')[1]);
   console.log('tokenPayLoad: ' + tokenPayLoad);
-  return { username: JSON.parse(tokenPayLoad).user }
+  return { username: JSON.parse(tokenPayLoad).login }
 }
 
 const getUser = async () => {
@@ -43,7 +38,6 @@ const removeUser = () => {
 const TokenService = {
   getLocalRefreshToken,
   getLocalAccessToken,
-  setLocalTokens,
   updateLocalTokens,
   getUser,
   removeUser,

@@ -1,11 +1,12 @@
 import api from "./api";
 import TokenService from "./token.service";
+import CryptoJS from "crypto-js";
 
-const login = (username, password) => {
+const login = (loginName, password) => {
   return api
     .post("/auth", {
-      username,
-      password
+      login: loginName,
+      password: CryptoJS.SHA256(password).toString()
     })
     .then((response) => {
       if (response.data.accessToken) {

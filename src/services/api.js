@@ -21,7 +21,8 @@ const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   method,
   headers: {
     'Content-Type': 'application/json;charset=utf-8',
-    'x-access-token': TokenService.getLocalAccessToken()
+    'x-access-token': TokenService.getLocalAccessToken(),
+    Authorization: 'Bearer ' + TokenService.getLocalAccessToken()
   },
   body: bodyObject && JSON.stringify(bodyObject)
 })
