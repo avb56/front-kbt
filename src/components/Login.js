@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import AuthService from "../services/auth.service";
-import TokenService from "../services/token.service";
 
 const Login = (props) => {
 
@@ -30,7 +29,6 @@ const Login = (props) => {
       response => {
         window.location.reload();
         // return response;
-        // TokenService.updateLocalTokens(response.data);
       },
       (error) => {
         const resMessage =
