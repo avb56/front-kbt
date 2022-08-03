@@ -1,4 +1,12 @@
-import TokenService from "./token.service";
+import AuthService from "./auth.service";
+
+//const baseUrl = 'http://192.168.1.175:8080/api';
+//const baseUrl = 'http://192.168.78.159:8080/api';
+const baseUrl = 'http://localhost:8080/api';
+//const baseUrl = 'https://test.orenkontur.ru/api';
+//const baseUrl = 'http://192.168.78.22/1c-jwt-master/hs/api';
+
+let lastArguments;
 
 const parseType = headers => headers.get('Content-Type').includes('/json') ? 'json' : 'text';
 const readBodyResponse = response => response[parseType(response.headers)]()
@@ -11,18 +19,13 @@ const readBodyResponse = response => response[parseType(response.headers)]()
       throw(response);
     }
   });
-//const baseUrl = 'http://192.168.1.175:8080/api';
-//const baseUrl = 'http://192.168.78.159:8080/api';
-const baseUrl = 'http://localhost:8080/api';
-//const baseUrl = 'https://test.orenkontur.ru/api';
-//const baseUrl = 'http://192.168.78.22/1c-jwt-master/hs/api';
 
 const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   method,
   headers: {
     'Content-Type': 'application/json;charset=utf-8',
-    'x-access-token': TokenService.getLocalAccessToken(),
-    Authorization: 'Bearer ' + TokenService.getLocalAccessToken()
+    //'x-access-token': AuthService.getLocalAccessToken(),
+    Authorization: 'Bearer ' + AuthService.getLocalAccessToken()
   },
   body: bodyObject && JSON.stringify(bodyObject)
 })
@@ -30,10 +33,10 @@ const customFetch = (method, url, bodyObject) => fetch(baseUrl + url, {
   // console.log(response);
  
   if (response.status == 401) return api.post("/auth", {
-    refreshToken: TokenService.getLocalRefreshToken(),
+    refreshToken: AuthService.getLocalRefreshToken(),
   })
   .then(response => {
-    TokenService.updateLocalTokens(response.data);
+    AuthService.updateLocalTokens(response.data);
     return customFetch(method, url, bodyObject)
   });
   return readBodyResponse(response);

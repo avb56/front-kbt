@@ -1,6 +1,6 @@
 import api from "./api";
-import TokenService from "./token.service";
 import CryptoJS from "crypto-js";
+var accessToken;
 
 const login = (loginName, password) => {
   return api
@@ -10,7 +10,7 @@ const login = (loginName, password) => {
     })
     .then((response) => {
       if (response.data.accessToken) {
-        TokenService.updateLocalTokens(response.data);
+        updateLocalTokens(response.data);
       }
 
       return response.data;
@@ -18,17 +18,56 @@ const login = (loginName, password) => {
 };
 
 const logout = () => {
-  TokenService.removeUser();
+  removeUser();
 };
 
 const getCurrentUser = () => {
-  return TokenService.getUser();
+  return getUser();
+};
+
+const getLocalRefreshToken = () => localStorage.getItem("refreshToken");
+
+const getLocalAccessToken = () => accessToken;
+
+const updateLocalTokens = (data) => {
+  accessToken = data.accessToken;
+  localStorage.setItem("refreshToken", data.refreshToken);
+}
+
+const getUserFromJwt = () => {
+  const tokenPayLoad = atob(getLocalAccessToken().split('.')[1]);
+  console.log('tokenPayLoad: ' + tokenPayLoad);
+  return { username: JSON.parse(tokenPayLoad).login }
+}
+
+const getUser = async () => {
+  if (getLocalAccessToken()) {
+    return getUserFromJwt();
+  } else {
+    if (getLocalRefreshToken()) {
+      const response = await api.post("/auth", { refreshToken: getLocalRefreshToken() });
+      //console.log(response);
+      if (response && response.data) {
+        updateLocalTokens(response.data);
+        return getUserFromJwt();
+      }
+    }
+  }
+};
+
+const removeUser = () => {
+  localStorage.removeItem("refreshToken");
 };
 
 const AuthService = {
   login,
   logout,
   getCurrentUser,
+  getLocalRefreshToken,
+  getLocalAccessToken,
+  updateLocalTokens,
+  getUser,
+  removeUser,
 };
 
 export default AuthService;
